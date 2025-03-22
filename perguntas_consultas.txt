@@ -1,0 +1,77 @@
+1 - Qual a diária mais cara de cada hotel?
+SELECT h.nome, MAX(q.valor_diaria) AS MaiorValorDiaria
+FROM Hotel h
+INNER JOIN Quarto q ON h.id_hotel = q.id_hotel
+GROUP BY h.nome;
+======
+2 - Dado uma reserva, qual o nome do cliente e quais são os quartos e as datas dessa reserva?
+SELECT u.nome, rq.id_quarto, h.nome, rq.data_entrada, rq.data_saida
+FROM reserva_quarto rq
+INNER JOIN reserva r ON rq.id_reserva = r.id_reserva
+INNER JOIN hotel h ON rq.id_hotel = h.id_hotel
+INNER JOIN cliente c ON r.cpf = c.cpf
+INNER JOIN usuário u ON c.cpf = u.cpf;
+======
+3 - Quantos quartos cada cliente reservou?
+SELECT c.cpf, u.nome, COUNT(rq.id_quarto) AS total_quartos_reservados
+FROM Cliente c
+INNER JOIN Usuário u ON c.cpf = u.cpf
+INNER JOIN Reserva r ON c.cpf = r.cpf
+INNER JOIN Reserva_Quarto rq ON r.id_reserva = rq.id_reserva
+GROUP BY c.cpf, u.nome;
+======
+4 - Qual é o hotel mais reservado?
+SELECT h.nome, COUNT(rq.id_quarto) AS total_quartos_reservados
+FROM Reserva_Quarto rq
+INNER JOIN Hotel h ON rq.id_hotel = h.id_hotel
+GROUP BY h.nome
+ORDER BY total_quartos_reservados DESC
+LIMIT 1;
+======
+5 - Quais são os clientes que gastaram mais em reservas?
+SELECT u.nome, c.cpf, SUM(rq.valor) AS total_gasto
+FROM Cliente c
+INNER JOIN Usuário u ON c.cpf = u.cpf
+INNER JOIN Reserva r ON c.cpf = r.cpf
+INNER JOIN Reserva_Quarto rq ON r.id_reserva = rq.id_reserva
+GROUP BY u.nome, c.cpf
+ORDER BY total_gasto DESC;
+======
+6 - Quantas avaliações cada quarto recebeu?
+SELECT rq.id_quarto, rq.id_hotel, COUNT(a.conteudo) AS total_avaliacoes
+FROM Reserva_Quarto rq
+INNER JOIN Avaliação a ON rq.id_quarto = a.id_quarto AND rq.id_hotel = a.id_hotel
+GROUP BY rq.id_quarto, rq.id_hotel
+ORDER BY id_quarto ASC;
+======
+7 - Qual a média de estrelas de avaliações de cada hotel?
+SELECT h.id_hotel, h.nome, ROUND(AVG(av.estrelas),1) AS MediaEstrelas
+FROM Hotel h
+INNER JOIN Avaliação av ON h.id_hotel = av.id_hotel
+GROUP BY h.id_hotel
+ORDER BY id_hotel ASC;
+======
+8 - Quais hotéis possuem quartos reservados?
+SELECT DISTINCT h.nome
+FROM Hotel h
+INNER JOIN Quarto q ON h.id_hotel = q.id_hotel
+INNER JOIN Reserva_Quarto rq ON q.id_quarto = rq.id_quarto;
+======
+9 - Quais clientes fizeram reservas em hotéis de 4 estrelas?
+SELECT DISTINCT u.nome, h.nome
+FROM Cliente c
+INNER JOIN Usuário u ON c.cpf = u.cpf
+INNER JOIN Reserva r ON c.cpf = r.cpf
+INNER JOIN Reserva_Quarto rq ON r.id_reserva = rq.id_reserva
+INNER JOIN Quarto q ON rq.id_quarto = q.id_quarto
+INNER JOIN Hotel h ON q.id_hotel = h.id_hotel
+WHERE h.estrelas = 4;
+======
+10 - Quais hoteis possuem suites?
+SELECT h.nome, COUNT(q.id_quarto) AS NumeroDeSuites
+FROM Hotel h
+LEFT JOIN Quarto q ON h.id_hotel = q.id_hotel
+WHERE q.tipo = 'Suite'
+GROUP BY h.nome;
+
+
